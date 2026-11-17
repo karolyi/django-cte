@@ -12,7 +12,10 @@ class CTEColumns:
     def __getattr__(self, name: str) -> CTEColumn: ...
 
 # `Field[Any, Any]` is django-stubs' "any field": `Field` is
-# contravariant in its set type, so `object` does not fit there
+# contravariant in its set type, so `object` does not fit there.
+# `relabeled_clone()` is inherited from django-stubs' `Expression`: the
+# runtime override names its parameter `change_map` as Django does, so
+# stubtest accepts the inherited signature.
 class CTEColumn(Expression):
     table_alias: str | None
     name: str

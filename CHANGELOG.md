@@ -14,8 +14,6 @@
     `CTE.queryset()` returns the CTE's body queryset type.
   - Type checkers report the deprecated `With`, `CTEQuerySet` and
     `CTEManager` as deprecated.
-- `raw_cte_sql()` returns a subclass of the new `RawCTEQuerySet` marker
-  class (`django_cte.raw.RawCTEQuerySet`).
 - **BREAKING:** the `relabels` parameter of `CTEColumn.relabeled_clone()` is
   renamed to `change_map`, as in Django. Only keyword calls
   (`relabeled_clone(relabels=...)`) break; Django passes it by position.

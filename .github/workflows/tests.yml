@@ -21,6 +21,14 @@ jobs:
         | jq --slurp .
         | tr '\n' ' '
         )" >> $GITHUB_OUTPUT
+    - name: Pick the most recent Python version
+      id: latest-python-version
+      # produces output like: latest_python_version=3.14
+      run: >-
+        echo "latest_python_version=$(
+        echo '${{ steps.read-python-versions.outputs.python_versions }}'
+        | jq --raw-output 'max_by(split(".") | map(tonumber))'
+        )" >> $GITHUB_OUTPUT
     - name: Read Django versions from pyproject.toml
       id: read-django-versions
       # django_versions=[ "Django~=4.2.0", "Django~=5.1.0", "Django~=5.2.0" ]
@@ -34,6 +42,7 @@ jobs:
         )" >> $GITHUB_OUTPUT
     outputs:
       python_versions: ${{ steps.read-python-versions.outputs.python_versions }}
+      latest_python_version: ${{ steps.latest-python-version.outputs.latest_python_version }}
       django_versions: ${{ steps.read-django-versions.outputs.django_versions }}
 
   tests:
@@ -98,17 +107,18 @@ jobs:
     # The package ships hand-written .pyi stubs next to untyped .py
     # modules; stubtest fails when the two drift apart (missing or
     # renamed names, mismatching signatures). One Python and Django
-    # version suffices: the stubs do not vary between them. The runtime
-    # does vary, as `@deprecated` differs from Python 3.13 on, so keep
-    # the Python version in sync with stubtest-whitelist.txt: some of
-    # its entries only apply to 3.13+, and unused entries fail stubtest.
+    # version suffices: the stubs do not vary between them. The most
+    # recent Python version of the test matrix is used, as some entries
+    # of stubtest-whitelist.txt only apply to Python 3.13+, and unused
+    # entries fail stubtest.
+    needs: [configure]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - uses: astral-sh/setup-uv@v6
       with:
         version: '>=0.7'
-        python-version: '3.13'
+        python-version: ${{ needs.configure.outputs.latest_python_version }}
     - name: Setup
       run: uv sync --locked --group typing
     - name: Check type stubs

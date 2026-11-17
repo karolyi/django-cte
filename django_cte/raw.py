@@ -1,7 +1,3 @@
-class RawCTEQuerySet:
-    """Opaque result of `raw_cte_sql()`, only usable as a `CTE` body"""
-
-
 def raw_cte_sql(sql, params, refs):
     """Raw CTE SQL
 
@@ -32,7 +28,7 @@ def raw_cte_sql(sql, params, refs):
         # Name used by Django < 6.1.
         quote_name_unless_alias = quote_name
 
-    class raw_cte_queryset(RawCTEQuerySet):
+    class RawCTEQuerySet:
         class query:
             annotations = {}
 
@@ -48,4 +44,4 @@ def raw_cte_sql(sql, params, refs):
             def resolve_expression(cls, *args, **kwargs):
                 return cls
 
-    return raw_cte_queryset
+    return RawCTEQuerySet

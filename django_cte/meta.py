@@ -71,9 +71,6 @@ class CTEColumn(Expression):
         column = ref.target.column if isinstance(ref, Col) else self.name
         return "%s.%s" % (qn(self.table_alias), qn(column)), []
 
-    # Parameter named as in Django's `BaseExpression.relabeled_clone()`
-    # and in django-stubs' `Expression`, whose signature meta.pyi
-    # inherits, so keyword calls work and stubtest passes.
     def relabeled_clone(self, change_map):
         if self.table_alias is not None and self.table_alias in change_map:
             clone = self.copy()
